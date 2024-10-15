@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Updated p5.js link -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.js"></script>
+    <style>
+        body {display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: black;}
+        canvas {display: block;}
+    </style>
+</head>
+<body>
+<script>
+    let angleX = 0.0;
+    let angleY = 0.0;
+    let speedX = 0.01;
+    let speedY = 0.01;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
+    let prevTouchX = 0;
+    let prevTouchY = 0;
+    let isDragging = false;
+    let img;
+
+    function preload() {
+        img = loadImage('infotech_logo_3-768x768.png');
+    }
+
+    function setup() {
+        createCanvas(windowWidth, windowHeight, WEBGL);
+    }
+
+    function draw() {
+        background(0);
+        let sz = min(width, height) * 0.4;
+
+        disableDepthTest();
+        imageMode(CENTER);
+        image(img, 0, 0, sz, sz);
+        enableDepthTest();
+
+        if (isDragging) {
+            let deltaX = mouseX - prevMouseX;
+            let deltaY = mouseY - prevMouseY;
+            
+            if (touches.length > 0) {
+                deltaX = touches[0].x - prevTouchX;
+                deltaY = touches[0].y - prevTouchY;
+            }
+
+            angleY += deltaX * 0.01;
+            angleX -= deltaY * 0.01;
+        } else {
+            angleX += speedX;
+            angleY += speedY;
+        }
+
+        rotateX(angleX);
+        rotateY(angleY);
+
+        noFill();
+        stroke(255);
+        box(sz);
+
+        prevMouseX = mouseX;
+        prevMouseY = mouseY;
+        
+        if (touches.length > 0) {
+            prevTouchX = touches[0].x;
+            prevTouchY = touches[0].y;
+        }
+    }
+
+    function disableDepthTest() {
+        let gl = this._renderer.GL;
+        gl.disable(gl.DEPTH_TEST);
+    }
+
+    function enableDepthTest() {
+        let gl = this._renderer.GL;
+        gl.enable(gl.DEPTH_TEST);
+    }
+
+    function touchStarted() {
+        isDragging = true;
+        prevTouchX = touches[0].x;
+        prevTouchY = touches[0].y;
+        return false;
+    }
+
+    function touchEnded() {
+        isDragging = false;
+        return false;
+    }
+
+    function mousePressed() {
+        isDragging = true;
+    }
+
+    function mouseReleased() {
+        isDragging = false;
+    }
+</script>
+</body>
+</html>
